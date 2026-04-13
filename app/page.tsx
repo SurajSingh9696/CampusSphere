@@ -83,7 +83,7 @@ export default async function Home() {
       tag: `${content.map.locations.length} mapped facilities`,
     },
     {
-      title: "College & Admin Control",
+      title: "College Control",
       detail: "Manage institutional operations, audits, incidents, and records with role security.",
       href: "/admin/dashboard",
       icon: ShieldCheck,
