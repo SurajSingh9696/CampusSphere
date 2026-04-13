@@ -1,0 +1,94 @@
+@import "tailwindcss";
+
+:root {
+  --canvas: #f5f7fb;
+  --surface: #ffffff;
+  --soft-100: #f0f3f8;
+  --soft-200: #e7ebf3;
+  --ghost: rgba(131, 148, 180, 0.18);
+  --ink: #162235;
+  --ink-strong: #0d1829;
+  --ink-soft: #4c5b74;
+  --brand-100: #dce8ff;
+  --brand-600: #2558e2;
+  --brand-700: #123cae;
+  --brand-glow: rgba(37, 88, 226, 0.32);
+  --teal-100: #d8f7f2;
+  --teal-700: #067a69;
+  --violet-100: #efe6ff;
+  --violet-700: #6d37c4;
+  --danger-100: #ffe7e7;
+  --danger-700: #b93838;
+}
+
+@theme inline {
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-soft-100: var(--soft-100);
+  --color-soft-200: var(--soft-200);
+  --color-ink: var(--ink);
+  --color-ink-strong: var(--ink-strong);
+  --color-ink-soft: var(--ink-soft);
+  --color-brand-100: var(--brand-100);
+  --color-brand-600: var(--brand-600);
+  --color-brand-700: var(--brand-700);
+  --color-teal-100: var(--teal-100);
+  --color-teal-700: var(--teal-700);
+  --color-violet-100: var(--violet-100);
+  --color-violet-700: var(--violet-700);
+  --color-danger-100: var(--danger-100);
+  --color-danger-700: var(--danger-700);
+  --font-sans: var(--font-body);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(circle at top, #ffffff, var(--canvas) 52%);
+  color: var(--ink);
+  font-family: var(--font-body), sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.font-display {
+  font-family: var(--font-heading), sans-serif;
+}
+
+.surface-card {
+  background: var(--surface);
+  border: 1px solid var(--ghost);
+  box-shadow: 0 14px 36px rgba(19, 37, 64, 0.06);
+}
+
+.surface-soft {
+  background: var(--soft-100);
+}
+
+.surface-glass {
+  background: rgba(245, 247, 251, 0.86);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--brand-700), var(--brand-600));
+  color: #ffffff;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.2rem 0.65rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}

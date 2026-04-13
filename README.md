@@ -1,36 +1,86 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CampusSphere Live Portal
 
-## Getting Started
+CampusSphere is a full redesign of the Stitch references into a production-ready Next.js + MongoDB platform.
 
-First, run the development server:
+The app now includes working authentication, role-protected routes, and live server actions across student, college, and admin workflows.
+
+## What Works Dynamically
+
+- Role login and secure session cookies
+- Protected route segments (`student`, `college`, `admin`, `operations`, `campus`)
+- Student attendance marking (updates timeline and operation logs)
+- Community posting and event registration
+- Resource upload and download counter tracking
+- Utilities actions (study-buddy request post + lost item reporting)
+- College batch upload history updates
+- Admin incident logging + incident resolution
+- CSV exports for college schedule and admin audit logs
+
+## Module Coverage
+
+- Landing and role-based login
+- Student dashboard, attendance, resources, community, utilities
+- Smart attendance operations
+- Campus navigation and events
+- College administration dashboard
+- Admin control center
+
+## Tech Stack
+
+- Next.js App Router (TypeScript)
+- Tailwind CSS 4
+- MongoDB + Mongoose
+- Server Actions for write workflows
+- Lucide icons
+
+## Setup
+
+1. Install dependencies:
+
+```bash
+npm install
+```
+
+2. Create environment variables:
+
+```bash
+copy .env.example .env.local
+```
+
+3. Update `.env.local`:
+
+- `MONGODB_URI`
+- `MONGODB_DB`
+- `SESSION_SECRET` (long random string)
+
+4. Run the app:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Demo Login Accounts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Student: `student@campusphere.app` / `Student@123`
+- College: `college@campusphere.app` / `College@123`
+- Admin: `admin@campusphere.app` / `Admin@123`
 
-## Learn More
+These accounts are auto-seeded when MongoDB is available.
 
-To learn more about Next.js, take a look at the following resources:
+## Protected API Notes
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `GET /api/auth/me`: current authenticated user
+- `POST /api/auth/login`: login
+- `POST /api/auth/logout`: logout
+- `GET /api/content`: authenticated users only
+- `GET/POST /api/seed`: admin only
+- `GET /api/exports/college-schedule`: college/admin only
+- `GET /api/exports/admin-audit`: admin only
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Notes
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- If `MONGODB_URI` is not configured, the app still runs with an in-memory fallback for local development.
+- With MongoDB configured, reads and writes persist through the shared content store.
+- In production, always set a strong `SESSION_SECRET`.
