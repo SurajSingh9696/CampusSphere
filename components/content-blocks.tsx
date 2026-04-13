@@ -15,7 +15,10 @@ export function StatGrid({ stats }: { stats: StatCard[] }) {
   return (
     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       {stats.map((stat) => (
-        <article key={`${stat.label}-${stat.value}`} className="surface-card rounded-3xl p-5">
+        <article
+          key={`${stat.label}-${stat.value}`}
+          className="surface-card rounded-3xl p-5 transition-transform duration-300 hover:-translate-y-1"
+        >
           <div className="flex items-center justify-between">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--ink-soft)]">
               {stat.label}

@@ -7,12 +7,20 @@ import { getCampusData } from "@/lib/data/campus-store";
 export const dynamic = "force-dynamic";
 
 const subjectSummary = [
-  { name: "Math", percent: "90% (36/40)", widthClass: "w-[90%]" },
-  { name: "Physics", percent: "85% (34/40)", widthClass: "w-[85%]" },
-  { name: "Chemistry", percent: "95% (38/40)", widthClass: "w-[95%]" },
-  { name: "Computer Science", percent: "88% (35/40)", widthClass: "w-[88%]" },
-  { name: "English", percent: "92% (37/40)", widthClass: "w-[92%]" },
+  { name: "Math", present: 36, total: 40 },
+  { name: "Physics", present: 34, total: 40 },
+  { name: "Chemistry", present: 38, total: 40 },
+  { name: "Computer Science", present: 35, total: 40 },
+  { name: "English", present: 37, total: 40 },
 ];
+
+function toPercent(present: number, total: number): number {
+  if (!total) {
+    return 0;
+  }
+
+  return Math.round((present / total) * 100);
+}
 
 export default async function StudentAttendancePage() {
   const content = await getCampusData();
@@ -21,7 +29,7 @@ export default async function StudentAttendancePage() {
   return (
     <StudentShell activePath="/student/attendance">
       <section className="surface-card rounded-[2rem] p-6 lg:p-8">
-        <h2 className="font-display text-4xl font-black text-[var(--ink-strong)]">Subject-wise Attendance</h2>
+        <h2 className="font-display text-3xl font-black text-[var(--ink-strong)] sm:text-4xl">Subject-wise Attendance</h2>
         <div className="mt-4 rounded-2xl bg-[var(--teal-100)] px-4 py-3 text-sm font-semibold text-[var(--teal-700)]">
           Live Geofencing: Active on Campus (GPS confirmed)
         </div>
@@ -60,19 +68,25 @@ export default async function StudentAttendancePage() {
         <aside className="surface-card rounded-3xl p-6 xl:col-span-5">
           <h3 className="font-display text-2xl font-bold text-[var(--ink-strong)]">Subject Attendance Summary</h3>
           <div className="mt-5 space-y-4">
-            {subjectSummary.map((subject) => (
-              <div key={subject.name}>
-                <div className="flex items-center justify-between text-sm">
-                  <p className="font-semibold text-[var(--ink-strong)]">{subject.name}</p>
-                  <p className="text-[var(--ink-soft)]">{subject.percent}</p>
-                </div>
-                <div className="mt-2 h-2 rounded-full bg-[var(--soft-200)]">
-                  <div
-                    className={`h-full rounded-full bg-gradient-to-r from-[var(--brand-700)] to-[var(--brand-600)] ${subject.widthClass}`}
+            {subjectSummary.map((subject) => {
+              const percentValue = toPercent(subject.present, subject.total);
+
+              return (
+                <div key={subject.name}>
+                  <div className="flex items-center justify-between text-sm">
+                    <p className="font-semibold text-[var(--ink-strong)]">{subject.name}</p>
+                    <p className="text-[var(--ink-soft)]">
+                      {percentValue}% ({subject.present}/{subject.total})
+                    </p>
+                  </div>
+                  <progress
+                    max={100}
+                    value={percentValue}
+                    className="attendance-progress mt-2 h-2 w-full overflow-hidden rounded-full"
                   />
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           <div className="mt-6 rounded-2xl bg-[var(--soft-100)] p-4">

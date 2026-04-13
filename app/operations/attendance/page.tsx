@@ -19,7 +19,7 @@ export default async function OperationsAttendancePage() {
       <section className="grid gap-6 xl:grid-cols-12">
         <article className="surface-card rounded-[2rem] p-6 xl:col-span-7 lg:p-8">
           <p className="chip bg-[var(--teal-100)] text-[var(--teal-700)]">Operations Center</p>
-          <h2 className="font-display mt-3 text-4xl font-black text-[var(--ink-strong)]">Smart Attendance</h2>
+          <h2 className="font-display mt-3 text-3xl font-black text-[var(--ink-strong)] sm:text-4xl">Smart Attendance</h2>
           <p className="mt-2 text-sm text-[var(--ink-soft)]">
             Real-time presence verification with QR scanner and geofence validation.
           </p>
@@ -29,8 +29,8 @@ export default async function OperationsAttendancePage() {
               <Radar className="h-4 w-4" />
               {operations.scannerState}
             </div>
-            <div className="grid place-items-center rounded-3xl border border-[color:var(--ghost)] bg-white p-10">
-              <div className="relative h-56 w-56 rounded-3xl bg-gradient-to-br from-[#0f1e3c] to-[#1b3b7c]">
+            <div className="grid place-items-center rounded-3xl border border-[color:var(--ghost)] bg-white p-6 sm:p-10">
+              <div className="relative h-44 w-44 rounded-3xl bg-gradient-to-br from-[#0f1e3c] to-[#1b3b7c] sm:h-56 sm:w-56">
                 <div className="absolute inset-6 rounded-2xl border-2 border-dashed border-white/40" />
                 <div className="absolute inset-x-10 top-1/2 h-1 -translate-y-1/2 bg-white/55" />
               </div>

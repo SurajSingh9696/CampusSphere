@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { Download, Filter, Star } from "lucide-react";
 
 import {
@@ -9,9 +11,102 @@ import { getCampusData } from "@/lib/data/campus-store";
 
 export const dynamic = "force-dynamic";
 
-export default async function StudentResourcesPage() {
+type ResourceSort = "downloads" | "rating" | "title";
+
+interface StudentResourcesPageProps {
+  searchParams: Promise<{
+    filter?: string | string[];
+    q?: string | string[];
+    sort?: string | string[];
+  }>;
+}
+
+function readParam(value: string | string[] | undefined): string {
+  if (Array.isArray(value)) {
+    return value[0] ?? "";
+  }
+
+  return value ?? "";
+}
+
+function parseDownloadCount(value: string): number {
+  const normalized = value.trim().toLowerCase();
+
+  if (normalized.endsWith("k")) {
+    const compact = Number.parseFloat(normalized.slice(0, -1));
+    return Number.isNaN(compact) ? 0 : Math.round(compact * 1000);
+  }
+
+  const parsed = Number.parseInt(normalized.replace(/[^\d]/g, ""), 10);
+  return Number.isNaN(parsed) ? 0 : parsed;
+}
+
+function withResourcesQuery(input: {
+  filter: string;
+  query: string;
+  sort: ResourceSort;
+}): string {
+  const params = new URLSearchParams();
+
+  if (input.filter !== "All Resources") {
+    params.set("filter", input.filter);
+  }
+
+  if (input.query) {
+    params.set("q", input.query);
+  }
+
+  if (input.sort !== "downloads") {
+    params.set("sort", input.sort);
+  }
+
+  const queryString = params.toString();
+  return queryString ? `/student/resources?${queryString}` : "/student/resources";
+}
+
+export default async function StudentResourcesPage({
+  searchParams,
+}: StudentResourcesPageProps) {
+  const params = await searchParams;
   const content = await getCampusData();
   const resources = content.resources;
+  const query = readParam(params.q).trim();
+  const requestedFilter = readParam(params.filter) || "All Resources";
+  const requestedSort = readParam(params.sort);
+  const sort: ResourceSort =
+    requestedSort === "rating" || requestedSort === "title" ? requestedSort : "downloads";
+  const filterOptions = Array.from(new Set(["All Resources", ...resources.filters]));
+  const activeFilter = filterOptions.includes(requestedFilter)
+    ? requestedFilter
+    : "All Resources";
+  const normalizedQuery = query.toLowerCase();
+
+  const filteredItems = resources.items
+    .filter((item) => {
+      const filterMatch = activeFilter === "All Resources" || item.kind === activeFilter;
+
+      if (!filterMatch) {
+        return false;
+      }
+
+      if (!normalizedQuery) {
+        return true;
+      }
+
+      const haystack = `${item.title} ${item.subject} ${item.kind} ${item.contributor}`.toLowerCase();
+      return haystack.includes(normalizedQuery);
+    })
+    .sort((first, second) => {
+      if (sort === "rating") {
+        return second.rating - first.rating;
+      }
+
+      if (sort === "title") {
+        return first.title.localeCompare(second.title);
+      }
+
+      return parseDownloadCount(second.downloads) - parseDownloadCount(first.downloads);
+    });
 
   return (
     <StudentShell activePath="/student/resources">
@@ -19,7 +114,7 @@ export default async function StudentResourcesPage() {
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="chip bg-[var(--teal-100)] text-[var(--teal-700)]">Resource Hub</p>
-            <h2 className="font-display mt-3 text-4xl font-black text-[var(--ink-strong)]">
+            <h2 className="font-display mt-3 text-3xl font-black text-[var(--ink-strong)] sm:text-4xl">
               The Prism of Shared Knowledge
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[var(--ink-soft)]">
@@ -56,32 +151,56 @@ export default async function StudentResourcesPage() {
           </form>
         </div>
 
+        <form method="GET" className="mt-5 grid gap-2 rounded-2xl border border-[color:var(--ghost)] bg-white p-3 sm:grid-cols-[1fr_auto_auto]">
+          <input
+            name="q"
+            defaultValue={query}
+            placeholder="Search title, subject, or contributor"
+            className="rounded-xl border border-[color:var(--ghost)] px-3 py-2 text-sm text-[var(--ink-strong)] outline-none focus:border-[var(--brand-600)]"
+          />
+          <select
+            name="sort"
+            defaultValue={sort}
+            title="Sort resources"
+            className="rounded-xl border border-[color:var(--ghost)] px-3 py-2 text-sm text-[var(--ink-strong)] outline-none focus:border-[var(--brand-600)]"
+          >
+            <option value="downloads">Sort: Most downloaded</option>
+            <option value="rating">Sort: Highest rated</option>
+            <option value="title">Sort: A-Z</option>
+          </select>
+          <input type="hidden" name="filter" value={activeFilter === "All Resources" ? "" : activeFilter} />
+          <button
+            type="submit"
+            className="btn-primary rounded-xl px-4 py-2 text-sm font-semibold"
+          >
+            Apply
+          </button>
+        </form>
+
         <div className="mt-6 flex flex-wrap items-center gap-2">
-          {resources.filters.map((filter, index) => (
-            <button
+          {filterOptions.map((filter) => (
+            <Link
               key={filter}
-              type="button"
+              href={withResourcesQuery({ filter, query, sort })}
               className={
-                index === 0
+                activeFilter === filter
                   ? "rounded-full bg-[var(--brand-700)] px-4 py-2 text-xs font-semibold text-white"
                   : "rounded-full bg-[var(--soft-100)] px-4 py-2 text-xs font-semibold text-[var(--ink-soft)]"
               }
             >
               {filter}
-            </button>
+            </Link>
           ))}
-          <button
-            type="button"
-            className="ml-auto inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-semibold text-[var(--brand-700)]"
-          >
+
+          <div className="ml-auto inline-flex items-center gap-2 rounded-full bg-[var(--soft-100)] px-3 py-2 text-xs font-semibold text-[var(--brand-700)]">
             <Filter className="h-4 w-4" />
-            Advanced Filters
-          </button>
+            {filteredItems.length} matches
+          </div>
         </div>
       </section>
 
       <section className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {resources.items.map((item) => (
+        {filteredItems.map((item) => (
           <article key={item.title} className="surface-card rounded-3xl p-5">
             <div className="flex items-start justify-between gap-3">
               <span className="chip bg-[var(--soft-100)] text-[var(--ink-soft)]">{item.kind}</span>
@@ -111,6 +230,15 @@ export default async function StudentResourcesPage() {
             </form>
           </article>
         ))}
+
+        {filteredItems.length === 0 ? (
+          <article className="surface-card rounded-3xl p-5 md:col-span-2 xl:col-span-4">
+            <p className="font-display text-xl font-bold text-[var(--ink-strong)]">No resources found</p>
+            <p className="mt-2 text-sm text-[var(--ink-soft)]">
+              Try adjusting your filter or search keywords.
+            </p>
+          </article>
+        ) : null}
       </section>
 
       <section className="surface-card mt-6 rounded-[2rem] p-6 lg:p-8">

@@ -1,24 +1,44 @@
 import { Download, Upload } from "lucide-react";
 
 import { addCollegeUploadAction } from "@/app/actions/portal-actions";
+import { getSession } from "@/lib/auth";
 import { StatGrid } from "@/components/content-blocks";
 import { CollegeShell } from "@/components/college-shell";
-import { getCampusData } from "@/lib/data/campus-store";
+import { getCampusData, getCampusDataMeta } from "@/lib/data/campus-store";
+import { getUserPortalRecord } from "@/lib/data/user-store";
 
 export const dynamic = "force-dynamic";
 
 export default async function CollegeDashboardPage() {
-  const content = await getCampusData();
+  const [content, dataMeta, session] = await Promise.all([
+    getCampusData(),
+    getCampusDataMeta(),
+    getSession(),
+  ]);
+
+  const portalUser = session ? await getUserPortalRecord(session.id) : null;
+  const collegeProfile = portalUser?.collegeProfile;
   const college = content.college;
 
   return (
     <CollegeShell activePath="/college/dashboard">
       <section className="surface-card rounded-[2rem] p-6 lg:p-8">
-        <p className="chip bg-[var(--brand-100)] text-[var(--brand-700)]">Institutional Reach</p>
-        <h2 className="font-display mt-3 text-4xl font-black text-[var(--ink-strong)]">College Operations Dashboard</h2>
+        <div className="flex flex-wrap items-center gap-2">
+          <p className="chip bg-[var(--brand-100)] text-[var(--brand-700)]">Institutional Reach</p>
+          <p className="chip bg-[var(--soft-100)] text-[var(--ink-soft)]">
+            {dataMeta.source === "database" ? "Live MongoDB" : "Memory Preview"}
+          </p>
+          {collegeProfile?.collegeShortCode ? (
+            <p className="chip bg-[var(--teal-100)] text-[var(--teal-700)]">{collegeProfile.collegeShortCode}</p>
+          ) : null}
+        </div>
+        <h2 className="font-display mt-3 text-3xl font-black text-[var(--ink-strong)] sm:text-4xl">College Operations Dashboard</h2>
         <p className="mt-2 max-w-2xl text-sm text-[var(--ink-soft)]">
-          Manage records, publish schedules, and monitor attendance analytics from one operational workspace.
+          {collegeProfile?.collegeLocation
+            ? `Manage records, schedules, and attendance for ${collegeProfile.collegeLocation}.`
+            : "Manage records, publish schedules, and monitor attendance analytics from one operational workspace."}
         </p>
+        <p className="mt-2 text-xs font-semibold uppercase tracking-[0.1em] text-[var(--ink-soft)]">Last synced {dataMeta.lastUpdatedAt}</p>
       </section>
 
       <section className="mt-6">

@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { ArrowUpRight, Building2, MapPinned } from "lucide-react";
 
 import { registerMapEventAction } from "@/app/actions/portal-actions";
@@ -6,34 +8,87 @@ import { getCampusData } from "@/lib/data/campus-store";
 
 export const dynamic = "force-dynamic";
 
-export default async function CampusMapPage() {
+interface CampusMapPageProps {
+  searchParams: Promise<{
+    location?: string | string[];
+  }>;
+}
+
+function readParam(value: string | string[] | undefined): string {
+  if (Array.isArray(value)) {
+    return value[0] ?? "";
+  }
+
+  return value ?? "";
+}
+
+function buildLocationHref(name: string): string {
+  const params = new URLSearchParams({ location: name });
+  return `/campus/map?${params.toString()}`;
+}
+
+export default async function CampusMapPage({ searchParams }: CampusMapPageProps) {
+  const params = await searchParams;
   const content = await getCampusData();
   const map = content.map;
+  const requestedLocation = readParam(params.location);
+  const selectedLocation =
+    map.locations.find((location) => location.name === requestedLocation)
+    ?? map.locations[0];
+  const mapQuery = `${selectedLocation?.name ?? "Campus"} university campus`;
+  const mapEmbedUrl = `https://www.google.com/maps?q=${encodeURIComponent(mapQuery)}&output=embed`;
+  const directionsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`;
 
   return (
     <StudentShell activePath="/campus/map">
       <section className="grid gap-6 xl:grid-cols-12">
         <article className="surface-card rounded-[2rem] p-6 xl:col-span-8 lg:p-8">
           <p className="chip bg-[var(--brand-100)] text-[var(--brand-700)]">Digital Navigator</p>
-          <h2 className="font-display mt-3 text-4xl font-black text-[var(--ink-strong)]">Campus Navigation & Events</h2>
+          <h2 className="font-display mt-3 text-3xl font-black text-[var(--ink-strong)] sm:text-4xl">Campus Navigation & Events</h2>
           <p className="mt-2 text-sm text-[var(--ink-soft)]">
             Navigate major facilities, discover open zones, and register for live seminars.
           </p>
 
           <div className="mt-6 rounded-3xl border border-[color:var(--ghost)] bg-[var(--soft-100)] p-4">
-            <div className="grid place-items-center rounded-2xl bg-white p-8">
-              <div className="grid h-[360px] w-full place-items-center rounded-2xl bg-gradient-to-br from-[#d9e7ff] to-[#f2f6ff]">
-                <div className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-[var(--brand-700)]">
+            <div className="grid gap-3 rounded-2xl bg-white p-4 sm:p-5">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="inline-flex items-center gap-2 rounded-full bg-[var(--brand-100)] px-3 py-1.5 text-xs font-semibold text-[var(--brand-700)]">
                   <MapPinned className="h-4 w-4" />
-                  Interactive map surface
-                </div>
+                  Live map from internet
+                </p>
+                <a
+                  href={directionsUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="rounded-lg border border-[color:var(--ghost)] px-3 py-1.5 text-xs font-semibold text-[var(--ink-strong)]"
+                >
+                  Open in Maps
+                </a>
+              </div>
+
+              <div className="overflow-hidden rounded-2xl border border-[color:var(--ghost)]">
+                <iframe
+                  src={mapEmbedUrl}
+                  title="Campus map"
+                  className="h-[300px] w-full sm:h-[380px]"
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
               </div>
             </div>
           </div>
 
           <div className="mt-6 grid gap-3 sm:grid-cols-3">
             {map.locations.map((location) => (
-              <article key={location.name} className="rounded-2xl bg-[var(--soft-100)] p-4">
+              <Link
+                key={location.name}
+                href={buildLocationHref(location.name)}
+                className={
+                  selectedLocation?.name === location.name
+                    ? "rounded-2xl border border-[var(--brand-600)] bg-[var(--brand-100)] p-4"
+                    : "rounded-2xl bg-[var(--soft-100)] p-4"
+                }
+              >
                 <p className="font-display text-lg font-bold text-[var(--ink-strong)]">{location.name}</p>
                 <p className="mt-2 text-sm text-[var(--ink-soft)]">{location.note}</p>
                 <span
@@ -45,7 +100,7 @@ export default async function CampusMapPage() {
                 >
                   {location.isOpen ? "Open" : "Busy"}
                 </span>
-              </article>
+              </Link>
             ))}
           </div>
         </article>

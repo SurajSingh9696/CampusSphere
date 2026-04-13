@@ -31,6 +31,38 @@ const userSchema = new Schema(
       type: Boolean,
       default: true,
     },
+    studentProfile: {
+      idCardNumber: {
+        type: String,
+        trim: true,
+      },
+      campus: {
+        type: String,
+        trim: true,
+      },
+      course: {
+        type: String,
+        trim: true,
+      },
+      stream: {
+        type: String,
+        trim: true,
+      },
+    },
+    collegeProfile: {
+      collegeCode: {
+        type: String,
+        trim: true,
+      },
+      collegeShortCode: {
+        type: String,
+        trim: true,
+      },
+      collegeLocation: {
+        type: String,
+        trim: true,
+      },
+    },
   },
   {
     timestamps: true,

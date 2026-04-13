@@ -29,7 +29,7 @@ export function AuthShell({
 }: AuthShellProps) {
   return (
     <div className="min-h-screen bg-[var(--canvas)] px-4 py-5 lg:px-8 lg:py-8">
-      <div className="mx-auto grid min-h-[calc(100vh-2.5rem)] w-full max-w-[1300px] overflow-hidden rounded-[2rem] border border-[color:var(--ghost)] bg-white shadow-[0_22px_60px_rgba(13,24,41,0.12)] md:grid-cols-[1.05fr,0.95fr]">
+      <div className="mx-auto grid min-h-[calc(100vh-2.5rem)] w-full max-w-[1300px] overflow-hidden rounded-[2rem] border border-[color:var(--ghost)] bg-white shadow-[0_22px_60px_rgba(13,24,41,0.12)] lg:grid-cols-[1.05fr_0.95fr]">
         <aside className="relative overflow-hidden bg-[radial-gradient(circle_at_20%_20%,#3f73f5_0%,#1748b8_38%,#0b1f4e_100%)] px-6 py-8 text-white sm:px-9 sm:py-10 lg:px-11 lg:py-12">
           <div className="absolute inset-0 bg-[size:72px_72px] opacity-35 [background-image:linear-gradient(90deg,rgba(255,255,255,0.16)_1px,transparent_1px),linear-gradient(rgba(255,255,255,0.16)_1px,transparent_1px)]" />
           <div className="absolute -left-16 top-16 h-48 w-48 rounded-3xl bg-white/15 blur-2xl" />
@@ -59,8 +59,8 @@ export function AuthShell({
               <p className="mt-4 text-sm leading-relaxed text-white/85">{leftDescription}</p>
 
               <ul className="mt-5 space-y-2.5">
-                {leftPoints.map((point) => (
-                  <li key={point} className="flex items-start gap-2.5 text-sm text-white/90">
+                {leftPoints.map((point, index) => (
+                  <li key={`${index}-${point}`} className="flex items-start gap-2.5 text-sm text-white/90">
                     <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-cyan-200" />
                     <span>{point}</span>
                   </li>

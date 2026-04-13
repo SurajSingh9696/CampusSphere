@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { CalendarClock, Flame, MessageCircleHeart } from "lucide-react";
 
 import {
@@ -9,9 +11,48 @@ import { getCampusData } from "@/lib/data/campus-store";
 
 export const dynamic = "force-dynamic";
 
-export default async function StudentCommunityPage() {
+interface StudentCommunityPageProps {
+  searchParams: Promise<{
+    q?: string | string[];
+  }>;
+}
+
+function readParam(value: string | string[] | undefined): string {
+  if (Array.isArray(value)) {
+    return value[0] ?? "";
+  }
+
+  return value ?? "";
+}
+
+function withCommunityQuery(query: string): string {
+  const params = new URLSearchParams();
+
+  if (query) {
+    params.set("q", query);
+  }
+
+  const queryString = params.toString();
+  return queryString ? `/student/community?${queryString}` : "/student/community";
+}
+
+export default async function StudentCommunityPage({
+  searchParams,
+}: StudentCommunityPageProps) {
+  const params = await searchParams;
   const content = await getCampusData();
   const community = content.community;
+  const query = readParam(params.q).trim();
+  const normalizedQuery = query.toLowerCase();
+  const filteredPosts = community.posts.filter((post) => {
+    if (!normalizedQuery) {
+      return true;
+    }
+
+    return `${post.author} ${post.role} ${post.content} ${post.tag ?? ""}`
+      .toLowerCase()
+      .includes(normalizedQuery);
+  });
 
   return (
     <StudentShell activePath="/student/community">
@@ -21,7 +62,7 @@ export default async function StudentCommunityPage() {
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
                 <p className="chip bg-[var(--violet-100)] text-[var(--violet-700)]">Campus Pulse</p>
-                <h2 className="font-display mt-3 text-4xl font-black text-[var(--ink-strong)]">Community & Events</h2>
+                <h2 className="font-display mt-3 text-3xl font-black text-[var(--ink-strong)] sm:text-4xl">Community & Events</h2>
                 <p className="mt-2 text-sm text-[var(--ink-soft)]">
                   Connect with peers, share insights, and join live events.
                 </p>
@@ -50,9 +91,24 @@ export default async function StudentCommunityPage() {
                 </button>
               </div>
             </form>
+
+            <form method="GET" className="mt-3 grid gap-2 rounded-2xl border border-[color:var(--ghost)] bg-white p-3 sm:grid-cols-[1fr_auto]">
+              <input
+                name="q"
+                defaultValue={query}
+                placeholder="Search posts by keyword"
+                className="rounded-xl border border-[color:var(--ghost)] px-3 py-2 text-sm text-[var(--ink-strong)] outline-none focus:border-[var(--brand-600)]"
+              />
+              <button
+                type="submit"
+                className="btn-primary rounded-xl px-4 py-2 text-sm font-semibold"
+              >
+                Search
+              </button>
+            </form>
           </div>
 
-          {community.posts.map((post) => (
+          {filteredPosts.map((post) => (
             <article key={`${post.author}-${post.ago}`} className="surface-card rounded-3xl p-6">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
@@ -75,6 +131,13 @@ export default async function StudentCommunityPage() {
               </div>
             </article>
           ))}
+
+          {filteredPosts.length === 0 ? (
+            <article className="surface-card rounded-3xl p-6">
+              <p className="font-display text-xl font-bold text-[var(--ink-strong)]">No posts match your search</p>
+              <p className="mt-2 text-sm text-[var(--ink-soft)]">Try another keyword or clear the query.</p>
+            </article>
+          ) : null}
         </div>
 
         <aside className="space-y-5 xl:col-span-4">
@@ -85,8 +148,13 @@ export default async function StudentCommunityPage() {
             </div>
             <ul className="space-y-3">
               {community.trending.map((trend) => (
-                <li key={trend} className="rounded-2xl bg-[var(--soft-100)] px-4 py-3 text-sm font-semibold text-[var(--ink-soft)]">
-                  {trend}
+                <li key={trend}>
+                  <Link
+                    href={withCommunityQuery(trend.replace(/^#/, ""))}
+                    className="block rounded-2xl bg-[var(--soft-100)] px-4 py-3 text-sm font-semibold text-[var(--ink-soft)] hover:bg-[var(--brand-100)] hover:text-[var(--brand-700)]"
+                  >
+                    {trend}
+                  </Link>
                 </li>
               ))}
             </ul>

@@ -6,22 +6,35 @@ import {
 } from "@/app/actions/portal-actions";
 import { StatGrid } from "@/components/content-blocks";
 import { AdminShell } from "@/components/admin-shell";
-import { getCampusData } from "@/lib/data/campus-store";
+import { getCampusData, getCampusDataMeta } from "@/lib/data/campus-store";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboardPage() {
-  const content = await getCampusData();
+  const [content, dataMeta] = await Promise.all([
+    getCampusData(),
+    getCampusDataMeta(),
+  ]);
+
   const admin = content.admin;
+  const openIncidentCount = admin.incidents.filter(
+    (incident) => incident.status.toLowerCase() !== "resolved",
+  ).length;
 
   return (
     <AdminShell activePath="/admin/dashboard">
       <section className="surface-card rounded-[2rem] p-6 lg:p-8">
-        <p className="chip bg-[var(--brand-100)] text-[var(--brand-700)]">Central Intelligence</p>
-        <h2 className="font-display mt-3 text-4xl font-black text-[var(--ink-strong)]">System Admin Control Center</h2>
+        <div className="flex flex-wrap items-center gap-2">
+          <p className="chip bg-[var(--brand-100)] text-[var(--brand-700)]">Central Intelligence</p>
+          <p className="chip bg-[var(--soft-100)] text-[var(--ink-soft)]">
+            {dataMeta.source === "database" ? "Live MongoDB" : "Memory Preview"}
+          </p>
+        </div>
+        <h2 className="font-display mt-3 text-3xl font-black text-[var(--ink-strong)] sm:text-4xl">System Admin Control Center</h2>
         <p className="mt-2 max-w-2xl text-sm text-[var(--ink-soft)]">
-          Oversee infrastructure health, institution compliance, and platform incidents in one live control surface.
+          Oversee infrastructure health, institution compliance, and {openIncidentCount} active incidents in one live control surface.
         </p>
+        <p className="mt-2 text-xs font-semibold uppercase tracking-[0.1em] text-[var(--ink-soft)]">Last synced {dataMeta.lastUpdatedAt}</p>
       </section>
 
       <section className="mt-6">
@@ -162,7 +175,7 @@ export default async function AdminDashboardPage() {
           </p>
           <h3 className="font-display mt-3 text-2xl font-bold">Network integrity stable at 99.9%</h3>
           <p className="mt-3 text-sm text-white/85">
-            Firewall protocols, institution moderation, and credential monitoring are all synchronized.
+            Firewall protocols, institution moderation, and credential monitoring are synchronized from {dataMeta.source === "database" ? "MongoDB" : "local memory"} data.
           </p>
           <a
             href="/api/exports/admin-audit"

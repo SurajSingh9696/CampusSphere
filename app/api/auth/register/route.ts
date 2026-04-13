@@ -6,12 +6,33 @@ import { createSessionForUser, setSessionCookie } from "@/lib/auth";
 import { roleLandingPath } from "@/lib/auth-shared";
 import { registerUser } from "@/lib/data/user-store";
 
-const registerSchema = z.object({
+const baseSchema = {
   name: z.string().min(2).max(80),
   email: z.string().email(),
   password: z.string().min(8).max(128),
-  role: z.enum(["student", "college"]),
-});
+};
+
+const registerSchema = z.discriminatedUnion("role", [
+  z.object({
+    ...baseSchema,
+    role: z.literal("student"),
+    details: z.object({
+      idCardNumber: z.string().min(2).max(80),
+      campus: z.string().min(2).max(120),
+      course: z.string().min(2).max(120),
+      stream: z.string().min(2).max(120),
+    }),
+  }),
+  z.object({
+    ...baseSchema,
+    role: z.literal("college"),
+    details: z.object({
+      collegeCode: z.string().min(2).max(40),
+      collegeShortCode: z.string().min(2).max(40),
+      collegeLocation: z.string().min(2).max(120),
+    }),
+  }),
+]);
 
 export async function POST(request: Request) {
   const body = await request.json().catch(() => ({}));

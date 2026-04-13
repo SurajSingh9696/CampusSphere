@@ -18,6 +18,11 @@ const BRAND_TAGLINE = "A connected digital campus for students and colleges.";
 
 let memoryCampusData: CampusData = normalizeCampusBrand(defaultCampusData);
 
+export interface CampusDataMeta {
+  source: "database" | "memory";
+  lastUpdatedAt: string;
+}
+
 function cloneCampusData(data: CampusData): CampusData {
   return JSON.parse(JSON.stringify(data)) as CampusData;
 }
@@ -61,6 +66,34 @@ function formatDownloadCount(value: number): string {
 
 function timestampLabel(): string {
   return DATE_FORMATTER.format(new Date());
+}
+
+function formatUpdatedLabel(value: Date | string | undefined): string {
+  if (!value) {
+    return timestampLabel();
+  }
+
+  return DATE_FORMATTER.format(new Date(value));
+}
+
+export async function getCampusDataMeta(): Promise<CampusDataMeta> {
+  const connection = await connectMongo();
+
+  if (!connection) {
+    return {
+      source: "memory",
+      lastUpdatedAt: timestampLabel(),
+    };
+  }
+
+  const existing = await ContentStore.findOne({ key: CONTENT_KEY })
+    .select("updatedAt")
+    .lean<{ updatedAt?: Date } | null>();
+
+  return {
+    source: "database",
+    lastUpdatedAt: formatUpdatedLabel(existing?.updatedAt),
+  };
 }
 
 export async function getCampusData(): Promise<CampusData> {

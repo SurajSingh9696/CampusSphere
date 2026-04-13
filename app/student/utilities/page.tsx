@@ -17,7 +17,7 @@ export default async function StudentUtilitiesPage() {
     <StudentShell activePath="/student/utilities">
       <section className="surface-card rounded-[2rem] p-6 lg:p-8">
         <p className="chip bg-[var(--brand-100)] text-[var(--brand-700)]">Connect & Collaborate</p>
-        <h2 className="font-display mt-3 text-4xl font-black text-[var(--ink-strong)]">Study Buddy Finder</h2>
+        <h2 className="font-display mt-3 text-3xl font-black text-[var(--ink-strong)] sm:text-4xl">Study Buddy Finder</h2>
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[var(--ink-soft)]">
           Match with peers by course, specialization, and learning style to build stronger study momentum.
         </p>

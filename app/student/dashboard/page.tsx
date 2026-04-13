@@ -4,25 +4,48 @@ import { ArrowUpRight, CalendarCheck2, Sparkles, Store } from "lucide-react";
 
 import { ActivityTone, StatGrid } from "@/components/content-blocks";
 import { StudentShell } from "@/components/student-shell";
-import { getCampusData } from "@/lib/data/campus-store";
+import { getSession } from "@/lib/auth";
+import { getCampusData, getCampusDataMeta } from "@/lib/data/campus-store";
+import { getUserPortalRecord } from "@/lib/data/user-store";
 
 export const dynamic = "force-dynamic";
 
 export default async function StudentDashboardPage() {
-  const content = await getCampusData();
+  const [content, dataMeta, session] = await Promise.all([
+    getCampusData(),
+    getCampusDataMeta(),
+    getSession(),
+  ]);
+
+  const portalUser = session ? await getUserPortalRecord(session.id) : null;
   const student = content.student;
+  const studentProfile = portalUser?.studentProfile;
+  const greeting = portalUser
+    ? `Welcome back, ${portalUser.name}.`
+    : student.greeting;
+  const studentContext = studentProfile
+    ? `${studentProfile.course} • ${studentProfile.stream} • ${studentProfile.campus}`
+    : "Your personalized workspace is synced across classes, resources, and campus operations.";
 
   return (
     <StudentShell activePath="/student/dashboard">
       <section className="surface-card overflow-hidden rounded-[2rem] p-6 lg:p-10">
         <div className="grid gap-8 lg:grid-cols-5">
           <div className="lg:col-span-3">
-            <p className="chip bg-[var(--brand-100)] text-[var(--brand-700)]">Academic Year 2026</p>
-            <h2 className="font-display mt-4 text-4xl font-black leading-tight text-[var(--ink-strong)]">
-              {student.greeting}
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="chip bg-[var(--brand-100)] text-[var(--brand-700)]">Academic Year 2026</p>
+              <p className="chip bg-[var(--soft-100)] text-[var(--ink-soft)]">
+                {dataMeta.source === "database" ? "Live MongoDB" : "Memory Preview"}
+              </p>
+            </div>
+            <h2 className="font-display mt-4 text-3xl font-black leading-tight text-[var(--ink-strong)] sm:text-4xl">
+              {greeting}
             </h2>
             <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-[var(--ink-soft)]">
-              Your personalized workspace is synced across classes, resources, and campus operations.
+              {studentContext}
+            </p>
+            <p className="mt-2 text-xs font-semibold uppercase tracking-[0.1em] text-[var(--ink-soft)]">
+              Last synced {dataMeta.lastUpdatedAt}
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <Link href="/student/attendance" className="btn-primary inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold">
@@ -45,15 +68,15 @@ export default async function StudentDashboardPage() {
               <ul className="mt-4 space-y-2 text-sm text-white/90">
                 <li className="flex items-center gap-2">
                   <Sparkles className="h-4 w-4" />
-                  Attendance trend remains above 90%
+                  Attendance trend steady at {content.operations.attendanceRate}
                 </li>
                 <li className="flex items-center gap-2">
                   <Sparkles className="h-4 w-4" />
-                  12 new resources published this day
+                  {content.resources.items.length} resources available in the library
                 </li>
                 <li className="flex items-center gap-2">
                   <Sparkles className="h-4 w-4" />
-                  Community discussions are actively growing
+                  {content.community.posts.length} community threads are active
                 </li>
               </ul>
             </div>

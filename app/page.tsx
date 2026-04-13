@@ -114,10 +114,10 @@ export default async function Home() {
         </header>
 
         <main className="surface-card mt-6 overflow-hidden rounded-[2rem]">
-          <section className="grid gap-10 px-5 py-14 lg:grid-cols-[1.05fr,0.95fr] lg:px-8 lg:py-16">
+          <section className="grid gap-10 px-5 py-14 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:py-16">
             <div>
               <p className="chip bg-[var(--brand-100)] text-[var(--brand-700)]">Unified Campus Experience</p>
-              <h1 className="font-display mt-5 text-4xl font-black leading-[1.1] text-[var(--ink-strong)] lg:text-6xl">
+              <h1 className="font-display mt-5 text-3xl font-black leading-[1.1] text-[var(--ink-strong)] sm:text-4xl lg:text-6xl">
                 {content.landing.headline}
               </h1>
               <p className="mt-5 max-w-2xl text-base leading-relaxed text-[var(--ink-soft)] lg:text-lg">

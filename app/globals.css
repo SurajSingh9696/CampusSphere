@@ -118,3 +118,21 @@ a {
 .edge-tilt-card:hover::before {
   opacity: 1;
 }
+
+.attendance-progress {
+  appearance: none;
+  border: 0;
+  background: var(--soft-200);
+}
+
+.attendance-progress::-webkit-progress-bar {
+  background: var(--soft-200);
+}
+
+.attendance-progress::-webkit-progress-value {
+  background: linear-gradient(90deg, var(--brand-700), var(--brand-600));
+}
+
+.attendance-progress::-moz-progress-bar {
+  background: linear-gradient(90deg, var(--brand-700), var(--brand-600));
+}

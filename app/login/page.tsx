@@ -23,12 +23,12 @@ export default async function LoginPage() {
       eyebrow="Secure Access"
       title="Sign in to Academic Orbit"
       subtitle="Use your institutional credentials to access your student or college workspace."
-      leftHeading="Welcome back to your campus workspace."
-      leftDescription="Sign in securely to continue your academic flow with role-based dashboards and live operational visibility."
+      leftHeading="Welcome back."
+      leftDescription="Sign in securely to continue with your role-based workspace."
       leftPoints={[
-        "Fast access to student and college workspaces",
-        "Secure sessions backed by protected routes",
-        "Connected experience across attendance, resources, and operations",
+        "Student and college access",
+        "Secure protected sessions",
+        "Connected operations tools",
       ]}
     >
       <LoginForm />
