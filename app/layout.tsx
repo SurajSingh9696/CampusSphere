@@ -14,11 +14,16 @@ const displayFont = Sora({
 
 export const metadata: Metadata = {
   title: {
-    default: "CampusSphere",
-    template: "%s | CampusSphere",
+    default: "Academic Orbit",
+    template: "%s | Academic Orbit",
   },
   description:
-    "Modern unified campus platform built with Next.js and MongoDB for students, colleges, and admins.",
+    "Modern unified campus platform built with Next.js and MongoDB for students and colleges.",
+  icons: {
+    icon: "/logo.png",
+    shortcut: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({

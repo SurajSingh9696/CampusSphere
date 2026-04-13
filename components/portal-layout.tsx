@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { ReactNode } from "react";
 
 import {
@@ -128,7 +129,16 @@ export function PortalLayout({
         <header className="surface-glass sticky top-0 z-30 border-b border-[color:var(--ghost)] px-5 py-4 lg:px-8">
           <div className="mx-auto flex w-full max-w-[1380px] items-center justify-between gap-6">
             <div className="flex items-center gap-8">
-              <h1 className="font-display text-xl font-bold text-[var(--ink-strong)]">{brand}</h1>
+              <div className="flex items-center gap-2.5">
+                <Image
+                  src="/logo.png"
+                  alt="Academic Orbit logo"
+                  width={132}
+                  height={62}
+                  className="h-8 w-auto rounded-md border border-[color:var(--ghost)] bg-white/90 p-1 object-contain"
+                />
+                <h1 className="font-display text-xl font-bold text-[var(--ink-strong)]">{brand}</h1>
+              </div>
               <nav className="hidden items-center gap-5 md:flex">
                 {topLinks.map((link) => {
                   const isActive = activeLink(activePath, link.href);

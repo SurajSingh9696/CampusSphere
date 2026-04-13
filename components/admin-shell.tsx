@@ -35,7 +35,7 @@ export async function AdminShell({ activePath, children }: AdminShellProps) {
 
   return (
     <PortalLayout
-      brand="Scholarly Prism"
+      brand="Academic Orbit"
       portalTitle="Global Control"
       portalType="Admin Portal"
       navItems={adminNav}

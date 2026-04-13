@@ -1,9 +1,10 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
 
+import { AuthShell } from "@/components/auth-shell";
 import { LoginForm } from "@/components/login-form";
 import { getSession } from "@/lib/auth";
-import { demoCredentials, roleLandingPath } from "@/lib/auth-shared";
-import { getCampusData } from "@/lib/data/campus-store";
+import { roleLandingPath } from "@/lib/auth-shared";
 import { ensureSeedUsers } from "@/lib/data/user-store";
 
 export const dynamic = "force-dynamic";
@@ -16,44 +17,44 @@ export default async function LoginPage() {
   }
 
   await ensureSeedUsers();
-  const content = await getCampusData();
 
   return (
-    <div className="grid min-h-screen bg-[var(--canvas)] lg:grid-cols-2">
-      <section className="hidden overflow-hidden bg-gradient-to-br from-[var(--brand-700)] via-[#1f4ed6] to-[#7aa8ff] p-10 text-white lg:block">
-        <div className="mx-auto flex h-full max-w-xl flex-col justify-between">
-          <div>
-            <p className="font-display text-3xl font-black">{content.brand.productName}</p>
-            <p className="mt-2 max-w-md text-sm text-white/85">{content.brand.tagline}</p>
-          </div>
+    <AuthShell
+      eyebrow="Secure Access"
+      title="Sign in to Academic Orbit"
+      subtitle="Use your institutional credentials to access your student or college workspace."
+      leftHeading="Welcome back to your campus workspace."
+      leftDescription="Sign in securely to continue your academic flow with role-based dashboards and live operational visibility."
+      leftPoints={[
+        "Fast access to student and college workspaces",
+        "Secure sessions backed by protected routes",
+        "Connected experience across attendance, resources, and operations",
+      ]}
+    >
+      <LoginForm />
 
-          <div className="rounded-3xl border border-white/20 bg-white/10 p-6 backdrop-blur-md">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/70">Platform Promise</p>
-            <h2 className="font-display mt-3 text-3xl font-black leading-tight">
-              Unified access to every academic workflow.
-            </h2>
-            <p className="mt-4 text-sm text-white/85">
-              Built on Next.js and MongoDB so every dashboard remains synchronized across roles.
-            </p>
-          </div>
+      <div className="mt-6 grid gap-3 sm:grid-cols-2">
+        <Link
+          href="/register/student"
+          className="rounded-xl border border-[color:var(--ghost)] bg-[var(--soft-100)] px-4 py-3 text-center text-sm font-semibold text-[var(--ink-strong)] transition hover:bg-[var(--brand-100)]"
+        >
+          Register as Student
+        </Link>
+        <Link
+          href="/register/college"
+          className="rounded-xl border border-[color:var(--ghost)] bg-[var(--soft-100)] px-4 py-3 text-center text-sm font-semibold text-[var(--ink-strong)] transition hover:bg-[var(--brand-100)]"
+        >
+          Register as College
+        </Link>
+      </div>
 
-          <div className="rounded-2xl bg-black/20 p-4 text-xs text-white/85">
-            {content.brand.platformLabel} • {content.brand.version}
-          </div>
-        </div>
-      </section>
+      <p className="mt-5 text-center text-xs text-[var(--ink-soft)]">Need onboarding support? Contact your institution support team.</p>
 
-      <section className="flex items-center px-5 py-10 lg:px-12">
-        <div className="mx-auto w-full max-w-xl">
-          <div className="surface-card rounded-3xl p-6 lg:p-8">
-            <h1 className="font-display text-3xl font-black text-[var(--ink-strong)]">Sign in to CampusSphere</h1>
-            <p className="mt-2 text-sm text-[var(--ink-soft)]">
-              Authenticate with your role account to open the live portal.
-            </p>
-            <LoginForm demoAccounts={demoCredentials} />
-          </div>
-        </div>
-      </section>
-    </div>
+      <div className="mt-3 text-center">
+        <Link href="/" className="text-sm font-semibold text-[var(--brand-700)]">
+          Back to landing page
+        </Link>
+      </div>
+    </AuthShell>
   );
 }

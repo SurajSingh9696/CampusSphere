@@ -5,6 +5,20 @@ import { demoCredentials, type UserRole } from "@/lib/auth-shared";
 import { connectMongo } from "@/lib/db";
 import { User } from "@/models/User";
 
+export type RegistrationRole = Exclude<UserRole, "admin">;
+
+export interface RegisterUserInput {
+  name: string;
+  email: string;
+  password: string;
+  role: RegistrationRole;
+}
+
+export interface RegisterUserResult {
+  user: AuthUser | null;
+  error: "email_exists" | null;
+}
+
 interface StoredUser {
   id: string;
   name: string;
@@ -105,5 +119,71 @@ export async function authenticateUser(
     name: existing.name,
     email: existing.email,
     role: existing.role,
+  };
+}
+
+export async function registerUser(
+  input: RegisterUserInput,
+): Promise<RegisterUserResult> {
+  const normalizedEmail = input.email.trim().toLowerCase();
+  const normalizedName = input.name.trim();
+  const connection = await connectMongo();
+
+  if (!connection) {
+    const duplicate = memoryUsers.find((user) => user.email === normalizedEmail);
+
+    if (duplicate) {
+      return {
+        user: null,
+        error: "email_exists",
+      };
+    }
+
+    const memoryUser: StoredUser = {
+      id: `memory-${memoryUsers.length + 1}`,
+      name: normalizedName,
+      email: normalizedEmail,
+      role: input.role,
+      passwordHash: hashPassword(input.password),
+      active: true,
+    };
+
+    memoryUsers.push(memoryUser);
+
+    return {
+      user: toAuthUser(memoryUser),
+      error: null,
+    };
+  }
+
+  await ensureSeedUsers();
+
+  const duplicate = await User.findOne({ email: normalizedEmail }).lean<{
+    _id: unknown;
+  } | null>();
+
+  if (duplicate) {
+    return {
+      user: null,
+      error: "email_exists",
+    };
+  }
+
+  const created = await User.create({
+    name: normalizedName,
+    email: normalizedEmail,
+    role: input.role,
+    passwordHash: hashPassword(input.password),
+    active: true,
+  });
+
+  return {
+    user: {
+      id: String(created._id),
+      name: created.name,
+      email: created.email,
+      role: created.role,
+    },
+    error: null,
   };
 }

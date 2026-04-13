@@ -1,6 +1,6 @@
-# CampusSphere Live Portal
+# Academic Orbit Live Portal
 
-CampusSphere is a full redesign of the Stitch references into a production-ready Next.js + MongoDB platform.
+Academic Orbit is a full redesign of the Stitch references into a production-ready Next.js + MongoDB platform.
 
 The app now includes working authentication, role-protected routes, and live server actions across student, college, and admin workflows.
 
@@ -63,9 +63,9 @@ Open `http://localhost:3000`.
 
 ## Demo Login Accounts
 
-- Student: `student@campusphere.app` / `Student@123`
-- College: `college@campusphere.app` / `College@123`
-- Admin: `admin@campusphere.app` / `Admin@123`
+- Student: `student@academicorbit.app` / `Student@123`
+- College: `college@academicorbit.app` / `College@123`
+- Admin: `admin@academicorbit.app` / `Admin@123`
 
 These accounts are auto-seeded when MongoDB is available.
 

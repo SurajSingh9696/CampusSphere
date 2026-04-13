@@ -15,7 +15,7 @@ export default async function CollegeDashboardPage() {
     <CollegeShell activePath="/college/dashboard">
       <section className="surface-card rounded-[2rem] p-6 lg:p-8">
         <p className="chip bg-[var(--brand-100)] text-[var(--brand-700)]">Institutional Reach</p>
-        <h2 className="font-display mt-3 text-4xl font-black text-[var(--ink-strong)]">College Administration Dashboard</h2>
+        <h2 className="font-display mt-3 text-4xl font-black text-[var(--ink-strong)]">College Operations Dashboard</h2>
         <p className="mt-2 max-w-2xl text-sm text-[var(--ink-soft)]">
           Manage records, publish schedules, and monitor attendance analytics from one operational workspace.
         </p>

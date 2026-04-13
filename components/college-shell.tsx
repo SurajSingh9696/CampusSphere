@@ -35,7 +35,7 @@ export async function CollegeShell({ activePath, children }: CollegeShellProps) 
 
   return (
     <PortalLayout
-      brand="Scholarly Prism"
+      brand="Academic Orbit"
       portalTitle="Institution Grid"
       portalType="College Portal"
       navItems={collegeNav}

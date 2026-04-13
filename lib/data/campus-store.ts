@@ -13,11 +13,25 @@ const DATE_FORMATTER = new Intl.DateTimeFormat("en-IN", {
   hour: "2-digit",
   minute: "2-digit",
 });
+const BRAND_NAME = "Academic Orbit";
+const BRAND_TAGLINE = "A connected digital campus for students and colleges.";
 
-let memoryCampusData: CampusData = cloneCampusData(defaultCampusData);
+let memoryCampusData: CampusData = normalizeCampusBrand(defaultCampusData);
 
 function cloneCampusData(data: CampusData): CampusData {
   return JSON.parse(JSON.stringify(data)) as CampusData;
+}
+
+function normalizeCampusBrand(data: CampusData): CampusData {
+  const draft = cloneCampusData(data);
+
+  draft.brand.productName = BRAND_NAME;
+  draft.brand.tagline = BRAND_TAGLINE;
+  draft.landing.subheadline = draft.landing.subheadline
+    .replace(/CampusSphere/gi, BRAND_NAME)
+    .replace(/students, colleges, and admins/gi, "students and colleges");
+
+  return draft;
 }
 
 function trimCollection<T>(items: T[], size = 12): T[] {
@@ -53,6 +67,7 @@ export async function getCampusData(): Promise<CampusData> {
   const connection = await connectMongo();
 
   if (!connection) {
+    memoryCampusData = normalizeCampusBrand(memoryCampusData);
     return cloneCampusData(memoryCampusData);
   }
 
@@ -61,23 +76,40 @@ export async function getCampusData(): Promise<CampusData> {
   } | null>();
 
   if (existing?.payload) {
-    return cloneCampusData(existing.payload);
+    const normalized = normalizeCampusBrand(existing.payload);
+    const shouldPersist =
+      existing.payload.brand.productName !== normalized.brand.productName
+      || existing.payload.brand.tagline !== normalized.brand.tagline
+      || existing.payload.landing.subheadline !== normalized.landing.subheadline;
+
+    if (shouldPersist) {
+      await ContentStore.findOneAndUpdate(
+        { key: CONTENT_KEY },
+        { payload: normalized },
+        { upsert: true },
+      );
+    }
+
+    return cloneCampusData(normalized);
   }
+
+  const seededPayload = normalizeCampusBrand(defaultCampusData);
 
   await ContentStore.create({
     key: CONTENT_KEY,
-    payload: defaultCampusData,
+    payload: seededPayload,
   });
 
-  return cloneCampusData(defaultCampusData);
+  return cloneCampusData(seededPayload);
 }
 
 export async function seedCampusData(reset = false): Promise<{ seeded: boolean }> {
   const connection = await connectMongo();
+  const seededPayload = normalizeCampusBrand(defaultCampusData);
 
   if (!connection) {
     if (reset) {
-      memoryCampusData = cloneCampusData(defaultCampusData);
+      memoryCampusData = cloneCampusData(seededPayload);
     }
 
     return { seeded: false };
@@ -86,7 +118,7 @@ export async function seedCampusData(reset = false): Promise<{ seeded: boolean }
   if (reset) {
     await ContentStore.findOneAndUpdate(
       { key: CONTENT_KEY },
-      { payload: defaultCampusData },
+      { payload: seededPayload },
       { upsert: true, new: true },
     );
     return { seeded: true };
@@ -95,7 +127,7 @@ export async function seedCampusData(reset = false): Promise<{ seeded: boolean }
   const existing = await ContentStore.findOne({ key: CONTENT_KEY }).lean();
 
   if (!existing) {
-    await ContentStore.create({ key: CONTENT_KEY, payload: defaultCampusData });
+    await ContentStore.create({ key: CONTENT_KEY, payload: seededPayload });
   }
 
   return { seeded: true };
@@ -103,15 +135,16 @@ export async function seedCampusData(reset = false): Promise<{ seeded: boolean }
 
 export async function updateCampusData(payload: CampusData): Promise<void> {
   const connection = await connectMongo();
+  const normalizedPayload = normalizeCampusBrand(payload);
 
   if (!connection) {
-    memoryCampusData = cloneCampusData(payload);
+    memoryCampusData = cloneCampusData(normalizedPayload);
     return;
   }
 
   await ContentStore.findOneAndUpdate(
     { key: CONTENT_KEY },
-    { payload },
+    { payload: normalizedPayload },
     { upsert: true },
   );
 }
@@ -124,7 +157,7 @@ export async function mutateCampusData(
   if (!connection) {
     const draft = cloneCampusData(memoryCampusData);
     mutator(draft);
-    memoryCampusData = draft;
+    memoryCampusData = normalizeCampusBrand(draft);
 
     return cloneCampusData(memoryCampusData);
   }
@@ -134,18 +167,20 @@ export async function mutateCampusData(
   } | null>();
 
   const draft = existing?.payload
-    ? cloneCampusData(existing.payload)
-    : cloneCampusData(defaultCampusData);
+    ? normalizeCampusBrand(existing.payload)
+    : normalizeCampusBrand(defaultCampusData);
 
   mutator(draft);
 
+  const normalized = normalizeCampusBrand(draft);
+
   await ContentStore.findOneAndUpdate(
     { key: CONTENT_KEY },
-    { payload: draft },
+    { payload: normalized },
     { upsert: true },
   );
 
-  return draft;
+  return normalized;
 }
 
 export async function markAttendance(

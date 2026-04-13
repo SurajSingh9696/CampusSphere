@@ -41,7 +41,7 @@ export async function StudentShell({ activePath, children }: StudentShellProps) 
 
   return (
     <PortalLayout
-      brand="Academic Atelier"
+      brand="Academic Orbit"
       portalTitle="Global Campus"
       portalType="Student Portal"
       navItems={studentNav}

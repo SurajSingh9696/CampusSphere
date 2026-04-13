@@ -2,15 +2,15 @@ import { CampusData } from "@/lib/types";
 
 export const defaultCampusData: CampusData = {
   brand: {
-    productName: "Academic Nexus",
+    productName: "Academic Orbit",
     platformLabel: "Unified Campus Portal",
-    tagline: "A connected digital campus for students, colleges, and admins.",
+    tagline: "A connected digital campus for students and colleges.",
     version: "v5.0.0",
   },
   landing: {
     headline: "Your Campus, Unified In One Intelligent Workspace",
     subheadline:
-      "CampusSphere brings academics, attendance, resources, community, and operations into a single live platform.",
+      "Academic Orbit brings academics, attendance, resources, community, and operations into a single live platform.",
     studentValueProps: [
       "Track attendance and class plans in real time",
       "Discover peer-reviewed notes and resources",
